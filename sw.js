@@ -1,9 +1,9 @@
-const CACHE_NAME = 'ukk-penilaian-v1';
+const CACHE_NAME = 'ukk-penilaian-v2';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './data.js',
-  './app.js',
+  './data.js?v=2',
+  './app.js?v=2',
   './manifest.json',
   'https://cdn.tailwindcss.com',
   'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js',
@@ -36,25 +36,23 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Network-first strategy for fast updates, fallback to cache
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      return fetch(event.request).then((networkResponse) => {
-        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
-          return networkResponse;
-        }
+    fetch(event.request).then((networkResponse) => {
+      if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
         const responseToCache = networkResponse.clone();
         caches.open(CACHE_NAME).then((cache) => {
           cache.put(event.request, responseToCache);
         });
-        return networkResponse;
-      }).catch(() => {
-        // Fallback to offline index.html if network fails
+      }
+      return networkResponse;
+    }).catch(() => {
+      return caches.match(event.request).then((cachedResponse) => {
+        if (cachedResponse) {
+          return cachedResponse;
+        }
         return caches.match('./index.html');
       });
     })
   );
 });
-

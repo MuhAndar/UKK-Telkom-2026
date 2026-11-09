@@ -40,20 +40,25 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// Theme Management
+// Theme Management (Fully responsive Dark & Light Mode)
 function initTheme() {
   const html = document.documentElement;
   const sunIcon = document.getElementById('theme-icon-sun');
   const moonIcon = document.getElementById('theme-icon-moon');
+  const metaThemeColor = document.querySelector('meta[name="theme-color"]');
 
   if (state.isDarkMode) {
     html.classList.add('dark');
+    if (document.body) document.body.classList.add('dark');
     if (sunIcon) sunIcon.classList.remove('hidden');
     if (moonIcon) moonIcon.classList.add('hidden');
+    if (metaThemeColor) metaThemeColor.setAttribute('content', '#090d16');
   } else {
     html.classList.remove('dark');
+    if (document.body) document.body.classList.remove('dark');
     if (sunIcon) sunIcon.classList.add('hidden');
     if (moonIcon) moonIcon.classList.remove('hidden');
+    if (metaThemeColor) metaThemeColor.setAttribute('content', '#f8fafc');
   }
 }
 
@@ -119,7 +124,7 @@ function showView(viewName, pushHistory = true) {
   if (viewName === 'days') {
     backBtn.classList.add('hidden');
     bottomBar.classList.add('hidden');
-    titleEl.innerHTML = `Penilaian UKK RPL <span class="text-[10px] uppercase font-semibold bg-indigo-500/20 text-indigo-300 px-1.5 py-0.5 rounded border border-indigo-500/30">Penguji</span>`;
+    titleEl.innerHTML = `Penilaian UKK RPL <span class="text-[10px] uppercase font-semibold bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 px-1.5 py-0.5 rounded border border-indigo-500/30">Penguji</span>`;
     subtitleEl.textContent = 'SMK Telkom • Tenaga Ahli';
     renderDaysView();
   } else if (viewName === 'students') {
@@ -185,18 +190,18 @@ function calculateStudentScore(student) {
 
   // Predikat kelulusan berdasarkan nilai rata-rata
   let predicate = 'Belum Ada';
-  let predicateColor = 'text-slate-400 bg-slate-800 border-slate-700';
+  let predicateColor = 'text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700';
 
   if (average !== null) {
     if (average >= 90) {
       predicate = 'Sangat Kompeten';
-      predicateColor = 'text-emerald-300 bg-emerald-500/15 border-emerald-500/30';
+      predicateColor = 'text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-500/15 border-emerald-200 dark:border-emerald-500/30';
     } else if (average >= 75) {
       predicate = 'Kompeten';
-      predicateColor = 'text-indigo-300 bg-indigo-500/15 border-indigo-500/30';
+      predicateColor = 'text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-500/15 border-indigo-200 dark:border-indigo-500/30';
     } else {
       predicate = 'Belum Kompeten';
-      predicateColor = 'text-rose-300 bg-rose-500/15 border-rose-500/30';
+      predicateColor = 'text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-500/15 border-rose-200 dark:border-rose-500/30';
     }
   }
 
@@ -244,21 +249,21 @@ function renderDaysView() {
     const dayAverage = scoredStudents > 0 ? (sumScore / scoredStudents).toFixed(1) : '-';
 
     html += `
-      <div onclick="selectDay('${day.id}')" class="group relative overflow-hidden rounded-2xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 hover:border-indigo-500/50 p-4 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-indigo-500/10 btn-press">
+      <div onclick="selectDay('${day.id}')" class="group relative overflow-hidden rounded-2xl bg-white dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700/80 hover:border-indigo-500/50 p-4 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-indigo-500/10 btn-press">
         <div class="flex items-start justify-between">
           <div class="space-y-1">
             <div class="flex items-center gap-2">
-              <span class="text-xs font-bold uppercase tracking-wider text-indigo-400 bg-indigo-500/15 px-2 py-0.5 rounded-md border border-indigo-500/20">
+              <span class="text-xs font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/15 px-2 py-0.5 rounded-md border border-indigo-200 dark:border-indigo-500/20">
                 ${day.hari}
               </span>
-              <span class="text-xs text-slate-400 font-medium">
+              <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">
                 ${day.tanggal}
               </span>
             </div>
-            <h3 class="text-base font-bold text-white group-hover:text-indigo-300 transition-colors">
+            <h3 class="text-base font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-300 transition-colors">
               ${day.nama}
             </h3>
-            <p class="text-xs text-slate-400 line-clamp-1">
+            <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-1">
               ${day.paketUtama}
             </p>
           </div>
@@ -266,27 +271,27 @@ function renderDaysView() {
           <div class="text-right shrink-0 ml-3">
             <span class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-bold ${
               completedCount === totalStudents 
-                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' 
+                ? 'bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30' 
                 : completedCount > 0 
-                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' 
-                  : 'bg-slate-700/70 text-slate-300'
+                  ? 'bg-amber-50 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/30' 
+                  : 'bg-slate-100 dark:bg-slate-700/70 text-slate-600 dark:text-slate-300'
             }">
               ${completedCount}/${totalStudents} Selesai
             </span>
-            <div class="text-[10px] text-slate-400 mt-1">Rata-rata: <span class="font-bold text-indigo-400">${dayAverage}</span></div>
+            <div class="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Rata-rata: <span class="font-bold text-indigo-600 dark:text-indigo-400">${dayAverage}</span></div>
           </div>
         </div>
 
         <!-- Progress bar per day -->
         <div class="mt-3.5 space-y-1.5">
-          <div class="w-full bg-slate-900/80 rounded-full h-2 overflow-hidden border border-slate-700/50">
+          <div class="w-full bg-slate-100 dark:bg-slate-900/80 rounded-full h-2 overflow-hidden border border-slate-200 dark:border-slate-700/50">
             <div class="h-2 rounded-full transition-all duration-300 ${
-              progressPercent === 100 ? 'bg-emerald-500' : 'bg-indigo-500'
+              progressPercent === 100 ? 'bg-emerald-500' : 'bg-indigo-600 dark:bg-indigo-500'
             }" style="width: ${progressPercent}%"></div>
           </div>
-          <div class="flex items-center justify-between text-[11px] text-slate-400">
+          <div class="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
             <span>Progress Pengujian</span>
-            <span class="font-semibold text-slate-300">${progressPercent}%</span>
+            <span class="font-semibold text-slate-700 dark:text-slate-300">${progressPercent}%</span>
           </div>
         </div>
       </div>
@@ -372,11 +377,11 @@ function renderStudentsView() {
 
   if (filtered.length === 0) {
     container.innerHTML = `
-      <div class="text-center py-10 px-4 rounded-2xl bg-slate-800/40 border border-slate-700/50">
-        <svg class="w-10 h-10 text-slate-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="text-center py-10 px-4 rounded-2xl bg-white dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/50 shadow-sm">
+        <svg class="w-10 h-10 text-slate-400 dark:text-slate-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
         </svg>
-        <p class="text-sm font-semibold text-slate-300">Tidak ada siswa ditemukan</p>
+        <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">Tidak ada siswa ditemukan</p>
         <p class="text-xs text-slate-500 mt-1">Coba sesuaikan kata kunci pencarian atau tab filter Anda.</p>
       </div>
     `;
@@ -389,33 +394,33 @@ function renderStudentsView() {
 
     let statusPill = '';
     if (stats.status === 'completed') {
-      statusPill = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Selesai (18/18)</span>`;
+      statusPill = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30">Selesai (18/18)</span>`;
     } else if (stats.status === 'draft') {
-      statusPill = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">Draft (${stats.count}/18)</span>`;
+      statusPill = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/30">Draft (${stats.count}/18)</span>`;
     } else {
-      statusPill = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-700/70 text-slate-400">Belum Dinilai</span>`;
+      statusPill = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-700/70 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-transparent">Belum Dinilai</span>`;
     }
 
     html += `
-      <div onclick="selectStudent('${stu.id}')" class="group p-3.5 rounded-2xl bg-slate-800/80 hover:bg-slate-800 border ${
-        stats.status === 'completed' ? 'border-emerald-500/30' : stats.status === 'draft' ? 'border-amber-500/30' : 'border-slate-700/70'
+      <div onclick="selectStudent('${stu.id}')" class="group p-3.5 rounded-2xl bg-white dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-800 border ${
+        stats.status === 'completed' ? 'border-emerald-200 dark:border-emerald-500/30' : stats.status === 'draft' ? 'border-amber-200 dark:border-amber-500/30' : 'border-slate-200 dark:border-slate-700/70'
       } hover:border-indigo-500/50 transition-all cursor-pointer shadow-sm btn-press">
         <div class="flex items-center justify-between gap-3">
           
           <div class="min-w-0 flex-1">
-            <div class="flex items-center gap-1.5 text-[11px] text-slate-400">
-              <span class="font-bold text-indigo-400">#${stu.no}</span>
+            <div class="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400">
+              <span class="font-bold text-indigo-600 dark:text-indigo-400">#${stu.no}</span>
               <span>•</span>
               <span>NIS: ${stu.nis}</span>
               <span>•</span>
-              <span class="font-semibold text-slate-300">${stu.kelas}</span>
+              <span class="font-semibold text-slate-700 dark:text-slate-300">${stu.kelas}</span>
             </div>
             
-            <h4 class="text-sm font-bold text-white group-hover:text-indigo-300 truncate mt-0.5">
+            <h4 class="text-sm font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-300 truncate mt-0.5">
               ${stu.nama}
             </h4>
 
-            <p class="text-[11px] text-slate-400 truncate mt-0.5">
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
               ${stu.paket}
             </p>
 
@@ -427,13 +432,13 @@ function renderStudentsView() {
 
           <!-- Score Card -->
           <div class="text-right shrink-0 pl-2">
-            <div class="text-[10px] text-slate-400 uppercase font-semibold">Nilai Akhir</div>
+            <div class="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-semibold">Nilai Akhir</div>
             <div class="text-xl font-black ${
-              stats.average === null ? 'text-slate-600' : stats.average >= 75 ? 'text-emerald-400' : 'text-amber-400'
+              stats.average === null ? 'text-slate-400 dark:text-slate-600' : stats.average >= 75 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'
             }">
               ${stats.average !== null ? stats.average : '-'}
             </div>
-            <div class="text-[10px] text-indigo-400 flex items-center justify-end gap-0.5 mt-0.5">
+            <div class="text-[10px] text-indigo-600 dark:text-indigo-400 flex items-center justify-end gap-0.5 mt-0.5">
               <span>Buka</span>
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
@@ -453,14 +458,14 @@ function setFilterStatus(status) {
   vibrate(10);
   state.activeFilter = status;
   document.querySelectorAll('.filter-tab').forEach(tab => {
-    tab.classList.remove('bg-indigo-600', 'text-white');
-    tab.classList.add('bg-slate-800', 'text-slate-400');
+    tab.classList.remove('bg-indigo-600', 'text-white', 'shadow-sm');
+    tab.classList.add('bg-white', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-400');
   });
 
   const activeTab = document.getElementById(`filter-${status}`);
   if (activeTab) {
-    activeTab.classList.remove('bg-slate-800', 'text-slate-400');
-    activeTab.classList.add('bg-indigo-600', 'text-white');
+    activeTab.classList.remove('bg-white', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-400');
+    activeTab.classList.add('bg-indigo-600', 'text-white', 'shadow-sm');
   }
 
   renderStudentsView();
@@ -550,30 +555,32 @@ function renderAssessmentView() {
 
 function createIndicatorCardHtml(ind, index, scoreVal, isFilled) {
   return `
-    <div id="card-ind-${index}" class="p-3.5 rounded-2xl bg-slate-800/80 border ${
-      isFilled ? 'border-indigo-500/40' : 'border-slate-700/60'
-    } transition-all space-y-2.5">
+    <div id="card-ind-${index}" class="p-3.5 rounded-2xl bg-white dark:bg-slate-800/80 border ${
+      isFilled ? 'border-indigo-500/50 dark:border-indigo-500/50' : 'border-slate-200 dark:border-slate-700/60'
+    } transition-all space-y-2.5 shadow-sm">
       
       <!-- Title & Num -->
       <div class="flex items-start justify-between gap-2">
-        <div class="space-y-0.5">
+        <div class="space-y-0.5 flex-1 min-w-0">
           <div class="flex items-center gap-1.5">
-            <span class="w-5 h-5 rounded-md bg-slate-700/90 text-slate-300 text-[11px] font-bold flex items-center justify-center">
+            <span class="w-5 h-5 rounded-md bg-slate-100 dark:bg-slate-700/90 text-slate-700 dark:text-slate-300 text-[11px] font-bold flex items-center justify-center">
               ${ind.num}
             </span>
-            <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">Indikator #${ind.num}</span>
+            <span class="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Indikator #${ind.num}</span>
           </div>
-          <h4 class="text-xs font-bold text-white leading-snug pt-1">
+          <h4 class="text-xs font-bold text-slate-900 dark:text-white leading-snug pt-1">
             ${ind.title}
           </h4>
-          <p class="text-[11px] text-slate-400 leading-tight">
+          <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-tight">
             ${ind.desc}
           </p>
         </div>
 
-        <!-- Input Box -->
+        <!-- Clean Numeric Input without browser spinner arrows -->
         <div class="shrink-0 flex flex-col items-end">
           <input type="number" 
+                 inputmode="numeric"
+                 pattern="[0-9]*"
                  id="input-ind-${index}" 
                  min="0" 
                  max="100" 
@@ -581,30 +588,30 @@ function createIndicatorCardHtml(ind, index, scoreVal, isFilled) {
                  value="${scoreVal}"
                  placeholder="0 - 100"
                  oninput="handleScoreInput(${index}, this.value)"
-                 class="w-20 py-1.5 px-2 text-center text-sm font-extrabold bg-slate-900 border ${
-                   isFilled ? 'border-indigo-500 text-indigo-300' : 'border-slate-700 text-slate-300'
-                 } rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                 class="w-20 py-1.5 px-2 text-center text-sm font-extrabold bg-slate-50 dark:bg-slate-900 border ${
+                   isFilled ? 'border-indigo-500 text-indigo-700 dark:text-indigo-300 ring-1 ring-indigo-500/30' : 'border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-300'
+                 } rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-inner">
         </div>
       </div>
 
       <!-- Quick Preset Buttons & Steppers for Ergonomic Mobile Scoring -->
-      <div class="flex items-center justify-between pt-1 border-t border-slate-700/40 text-xs">
+      <div class="flex items-center justify-between pt-1 border-t border-slate-100 dark:border-slate-700/40 text-xs">
         
         <!-- Preset values -->
         <div class="flex items-center gap-1 overflow-x-auto py-0.5">
-          <span class="text-[10px] text-slate-500 mr-0.5">Preset:</span>
-          <button type="button" onclick="setQuickScore(${index}, 75)" class="px-2 py-0.5 text-[11px] font-semibold bg-slate-700/70 hover:bg-indigo-600 text-slate-300 hover:text-white rounded-md border border-slate-600/50 btn-press">75</button>
-          <button type="button" onclick="setQuickScore(${index}, 80)" class="px-2 py-0.5 text-[11px] font-semibold bg-slate-700/70 hover:bg-indigo-600 text-slate-300 hover:text-white rounded-md border border-slate-600/50 btn-press">80</button>
-          <button type="button" onclick="setQuickScore(${index}, 85)" class="px-2 py-0.5 text-[11px] font-semibold bg-slate-700/70 hover:bg-indigo-600 text-slate-300 hover:text-white rounded-md border border-slate-600/50 btn-press">85</button>
-          <button type="button" onclick="setQuickScore(${index}, 90)" class="px-2 py-0.5 text-[11px] font-semibold bg-slate-700/70 hover:bg-indigo-600 text-slate-300 hover:text-white rounded-md border border-slate-600/50 btn-press">90</button>
-          <button type="button" onclick="setQuickScore(${index}, 95)" class="px-2 py-0.5 text-[11px] font-semibold bg-slate-700/70 hover:bg-indigo-600 text-slate-300 hover:text-white rounded-md border border-slate-600/50 btn-press">95</button>
+          <span class="text-[10px] text-slate-400 mr-0.5">Preset:</span>
+          <button type="button" onclick="setQuickScore(${index}, 75)" class="px-2 py-0.5 text-[11px] font-semibold bg-slate-100 dark:bg-slate-700/70 hover:bg-indigo-600 text-slate-700 dark:text-slate-300 hover:text-white rounded-md border border-slate-200 dark:border-slate-600/50 btn-press">75</button>
+          <button type="button" onclick="setQuickScore(${index}, 80)" class="px-2 py-0.5 text-[11px] font-semibold bg-slate-100 dark:bg-slate-700/70 hover:bg-indigo-600 text-slate-700 dark:text-slate-300 hover:text-white rounded-md border border-slate-200 dark:border-slate-600/50 btn-press">80</button>
+          <button type="button" onclick="setQuickScore(${index}, 85)" class="px-2 py-0.5 text-[11px] font-semibold bg-slate-100 dark:bg-slate-700/70 hover:bg-indigo-600 text-slate-700 dark:text-slate-300 hover:text-white rounded-md border border-slate-200 dark:border-slate-600/50 btn-press">85</button>
+          <button type="button" onclick="setQuickScore(${index}, 90)" class="px-2 py-0.5 text-[11px] font-semibold bg-slate-100 dark:bg-slate-700/70 hover:bg-indigo-600 text-slate-700 dark:text-slate-300 hover:text-white rounded-md border border-slate-200 dark:border-slate-600/50 btn-press">90</button>
+          <button type="button" onclick="setQuickScore(${index}, 95)" class="px-2 py-0.5 text-[11px] font-semibold bg-slate-100 dark:bg-slate-700/70 hover:bg-indigo-600 text-slate-700 dark:text-slate-300 hover:text-white rounded-md border border-slate-200 dark:border-slate-600/50 btn-press">95</button>
         </div>
 
         <!-- Stepper buttons & Clear -->
         <div class="flex items-center gap-1 shrink-0 ml-1">
-          <button type="button" onclick="stepScore(${index}, -5)" class="w-7 h-7 rounded-lg bg-slate-700/60 hover:bg-slate-700 text-slate-300 font-bold flex items-center justify-center btn-press" title="-5">-5</button>
-          <button type="button" onclick="stepScore(${index}, 5)" class="w-7 h-7 rounded-lg bg-slate-700/60 hover:bg-slate-700 text-slate-300 font-bold flex items-center justify-center btn-press" title="+5">+5</button>
-          <button type="button" onclick="clearScore(${index})" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-rose-900/40 text-slate-400 hover:text-rose-300 font-bold flex items-center justify-center btn-press" title="Kosongkan">
+          <button type="button" onclick="stepScore(${index}, -5)" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-700/60 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold flex items-center justify-center btn-press" title="-5">-5</button>
+          <button type="button" onclick="stepScore(${index}, 5)" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-700/60 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold flex items-center justify-center btn-press" title="+5">+5</button>
+          <button type="button" onclick="clearScore(${index})" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-rose-100 dark:hover:bg-rose-900/40 text-slate-500 hover:text-rose-600 dark:hover:text-rose-300 font-bold flex items-center justify-center btn-press" title="Kosongkan">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
@@ -638,13 +645,13 @@ function handleScoreInput(index, val) {
 
   if (cardEl && inputEl) {
     if (isFilled) {
-      cardEl.classList.remove('border-slate-700/60');
-      cardEl.classList.add('border-indigo-500/40');
-      inputEl.classList.add('border-indigo-500', 'text-indigo-300');
+      cardEl.classList.remove('border-slate-200', 'dark:border-slate-700/60');
+      cardEl.classList.add('border-indigo-500/50', 'dark:border-indigo-500/50');
+      inputEl.classList.add('border-indigo-500', 'text-indigo-700', 'dark:text-indigo-300', 'ring-1', 'ring-indigo-500/30');
     } else {
-      cardEl.classList.remove('border-indigo-500/40');
-      cardEl.classList.add('border-slate-700/60');
-      inputEl.classList.remove('border-indigo-500', 'text-indigo-300');
+      cardEl.classList.remove('border-indigo-500/50', 'dark:border-indigo-500/50');
+      cardEl.classList.add('border-slate-200', 'dark:border-slate-700/60');
+      inputEl.classList.remove('border-indigo-500', 'text-indigo-700', 'dark:text-indigo-300', 'ring-1', 'ring-indigo-500/30');
     }
   }
 
@@ -691,7 +698,8 @@ function batchFillScores(val) {
     if (inputEl) inputEl.value = val;
     const cardEl = document.getElementById(`card-ind-${idx}`);
     if (cardEl) {
-      cardEl.classList.add('border-indigo-500/40');
+      cardEl.classList.remove('border-slate-200', 'dark:border-slate-700/60');
+      cardEl.classList.add('border-indigo-500/50', 'dark:border-indigo-500/50');
     }
   });
 
@@ -716,11 +724,11 @@ function updateAssessmentStats() {
   if (pillEl) {
     pillEl.textContent = `${stats.count} / 18 Terisi`;
     if (stats.count === 18) {
-      pillEl.className = 'text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 inline-block';
+      pillEl.className = 'text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30 inline-block';
     } else if (stats.count > 0) {
-      pillEl.className = 'text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 inline-block';
+      pillEl.className = 'text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/30 inline-block';
     } else {
-      pillEl.className = 'text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 inline-block';
+      pillEl.className = 'text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 inline-block';
     }
   }
 }
@@ -858,35 +866,35 @@ function renderRekapView() {
     html += `
       <div class="mt-4 first:mt-0 space-y-2">
         <div class="flex items-center justify-between px-1">
-          <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider">${day.nama}</span>
-          <span class="text-[10px] text-slate-400">${dayStudents.length} Peserta</span>
+          <span class="text-xs font-bold text-indigo-700 dark:text-indigo-400 uppercase tracking-wider">${day.nama}</span>
+          <span class="text-[10px] text-slate-500 dark:text-slate-400">${dayStudents.length} Peserta</span>
         </div>
     `;
 
     dayStudents.forEach(stu => {
       const stats = calculateStudentScore(stu);
       html += `
-        <div onclick="selectStudentDirect('${stu.id}', '${day.id}')" class="p-3 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 flex items-center justify-between gap-3 cursor-pointer btn-press">
+        <div onclick="selectStudentDirect('${stu.id}', '${day.id}')" class="p-3 rounded-xl bg-white dark:bg-slate-800/60 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700/60 flex items-center justify-between gap-3 cursor-pointer btn-press shadow-sm">
           <div class="min-w-0 flex-1">
-            <div class="flex items-center gap-1.5 text-[10px] text-slate-400">
-              <span class="font-bold text-indigo-400">#${stu.no}</span>
+            <div class="flex items-center gap-1.5 text-[10px] text-slate-500 dark:text-slate-400">
+              <span class="font-bold text-indigo-600 dark:text-indigo-400">#${stu.no}</span>
               <span>•</span>
               <span>${stu.nis}</span>
               <span>•</span>
-              <span class="text-slate-300 font-semibold">${stu.kelas}</span>
+              <span class="text-slate-700 dark:text-slate-300 font-semibold">${stu.kelas}</span>
             </div>
-            <div class="text-xs font-bold text-white truncate mt-0.5">${stu.nama}</div>
-            <div class="text-[10px] text-slate-400 truncate">${stu.paket}</div>
+            <div class="text-xs font-bold text-slate-900 dark:text-white truncate mt-0.5">${stu.nama}</div>
+            <div class="text-[10px] text-slate-500 dark:text-slate-400 truncate">${stu.paket}</div>
           </div>
 
           <div class="text-right shrink-0">
             <div class="text-sm font-black ${
-              stats.average === null ? 'text-slate-500' : stats.average >= 75 ? 'text-emerald-400' : 'text-amber-400'
+              stats.average === null ? 'text-slate-400 dark:text-slate-500' : stats.average >= 75 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'
             }">
               ${stats.average !== null ? stats.average : '-'}
             </div>
             <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded ${
-              stats.status === 'completed' ? 'bg-emerald-500/20 text-emerald-300' : stats.status === 'draft' ? 'bg-amber-500/20 text-amber-300' : 'bg-slate-700 text-slate-400'
+              stats.status === 'completed' ? 'bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-transparent' : stats.status === 'draft' ? 'bg-amber-50 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-transparent' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
             }">
               ${stats.count}/18
             </span>
@@ -1185,4 +1193,3 @@ function setupEventListeners() {
     });
   }
 }
-
