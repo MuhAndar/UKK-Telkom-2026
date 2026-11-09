@@ -10,6 +10,7 @@ if %ERRORLEVEL% EQU 0 (
 ) else (
     echo.
     echo [CATATAN] Pastikan Anda telah membuat repository kosong bernama:
-    echo 'penilaian-ukk-telkom' di https://github.com/new
+    echo 'UKK-Telkom-2026' di https://github.com/MuhAndar/UKK-Telkom-2026
 )
 pause
+

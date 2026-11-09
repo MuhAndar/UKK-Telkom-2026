@@ -48,11 +48,9 @@ git init
 git add .
 git commit -m "feat: website penilaian UKK mobile"
 git branch -M main
-git remote add origin https://github.com/<username-github-anda>/<nama-repo>.git
+git remote add origin https://github.com/MuhAndar/UKK-Telkom-2026.git
 git push -u origin main
 ```
-
-*(Ganti `<username-github-anda>` dan `<nama-repo>` sesuai akun GitHub Anda)*
 
 ---
 
@@ -60,14 +58,14 @@ git push -u origin main
 
 #### Cara A: Otomatis via GitHub Actions (Sangat Direkomendasikan)
 Di dalam folder ini sudah disertakan file [`.github/workflows/deploy.yml`](file:///.github/workflows/deploy.yml).
-1. Buka repository Anda di GitHub melalui browser.
+1. Buka repository Anda di GitHub melalui browser: `https://github.com/MuhAndar/UKK-Telkom-2026`
 2. Klik tab **Settings** (Pengaturan repo) ➔ di menu sebelah kiri pilih **Pages**.
 3. Di bagian **Build and deployment** ➔ **Source**:
    - Ubah dari *Deploy from a branch* menjadi **GitHub Actions**.
 4. Selesai! GitHub Actions akan otomatis melakukan build dan deploy setiap kali Anda melakukan push.
 5. Website Anda langsung aktif di:
    ```
-   https://<username-github-anda>.github.io/<nama-repo>/
+   https://muhandar.github.io/UKK-Telkom-2026/
    ```
 
 #### Cara B: Menggunakan Branch Langsung
