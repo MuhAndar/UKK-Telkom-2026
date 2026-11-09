@@ -1,0 +1,9 @@
+# Ignore original excel spreadsheet containing raw student records
+*.xlsx
+students_data.json
+
+# OS and Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

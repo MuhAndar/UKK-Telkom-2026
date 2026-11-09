@@ -1,0 +1,23 @@
+{
+  "name": "Penilaian UKK RPL - Tenaga Ahli",
+  "short_name": "Penilaian UKK",
+  "description": "Aplikasi Penilaian Uji Kompetensi Keahlian SMK RPL untuk Tenaga Ahli",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#090d16",
+  "theme_color": "#090d16",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192' fill='%236366f1'><rect width='192' height='192' rx='40' fill='%230f172a'/><path d='M96 32L32 64l64 32 64-32-64-32zM32 112l64 32 64-32M32 80l64 32 64-32' stroke='%236366f1' stroke-width='12' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='%236366f1'><rect width='512' height='512' rx='100' fill='%230f172a'/><path d='M256 85L85 170l171 85 171-85-171-85zM85 298l171 85 171-85M85 213l171 85 171-85' stroke='%236366f1' stroke-width='32' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}
+
