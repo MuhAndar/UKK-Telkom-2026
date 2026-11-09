@@ -1,9 +1,9 @@
-const CACHE_NAME = 'ukk-penilaian-v2';
+const CACHE_NAME = 'ukk-penilaian-v3';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './data.js?v=2',
-  './app.js?v=2',
+  './data.js?v=3',
+  './app.js?v=3',
   './manifest.json',
   'https://cdn.tailwindcss.com',
   'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js',

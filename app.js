@@ -1,6 +1,7 @@
 // ============================================================
 // Penilaian UKK SMK Rekayasa Perangkat Lunak - Tenaga Ahli
 // Responsive Mobile Web App - Optimized for Poco F7 & Mobile
+// 16 Indikator Unik (Duplikat Dibersihkan) & Urutan Fleksibel
 // ============================================================
 
 // App State
@@ -13,6 +14,7 @@ const state = {
   activeFilter: 'all',
   searchQuery: '',
   historyStack: ['days'],
+  sortOrder: localStorage.getItem('ukk_sort_order') || 'workflow', // 'workflow' or 'standard'
   googleSheetUrl: localStorage.getItem('ukk_gsheet_url') || '',
   isDarkMode: localStorage.getItem('ukk_theme') !== 'light' // default dark
 };
@@ -168,16 +170,51 @@ function goBack() {
   }
 }
 
-// Student Scoring Calculations
+// Indicator Score Getter & Setter (Supports both ind.id and legacy numeric index)
+function getStudentIndicatorScore(student, indicator) {
+  if (!student || !student.nilai) return '';
+  // Check by unique string id (e.g. 'ind_12')
+  if (student.nilai[indicator.id] !== undefined && student.nilai[indicator.id] !== null && student.nilai[indicator.id] !== '') {
+    return student.nilai[indicator.id];
+  }
+  // Fallback to legacy index (origNum - 1)
+  const legacyIdx = indicator.origNum - 1;
+  if (student.nilai[legacyIdx] !== undefined && student.nilai[legacyIdx] !== null && student.nilai[legacyIdx] !== '') {
+    return student.nilai[legacyIdx];
+  }
+  return '';
+}
+
+function setStudentIndicatorScore(student, indicator, val) {
+  if (!student) return;
+  if (!student.nilai) student.nilai = {};
+
+  if (val === '' || val === null || isNaN(val)) {
+    delete student.nilai[indicator.id];
+    delete student.nilai[indicator.origNum - 1];
+  } else {
+    let num = Math.min(100, Math.max(0, parseFloat(val)));
+    student.nilai[indicator.id] = num;
+    student.nilai[indicator.origNum - 1] = num; // Mirror to legacy index
+  }
+}
+
+// Student Scoring Calculations (Total 16 Unique Indicators)
 function calculateStudentScore(student) {
-  const scores = student.nilai || {};
-  const values = Object.values(scores).filter(v => v !== null && v !== '' && !isNaN(Number(v))).map(Number);
-  const count = values.length;
-  const totalIndicators = 18;
+  const totalIndicators = state.indicators.length || 16;
+  let count = 0;
+  let sum = 0;
+
+  state.indicators.forEach(ind => {
+    const val = getStudentIndicatorScore(student, ind);
+    if (val !== '' && !isNaN(Number(val))) {
+      count++;
+      sum += Number(val);
+    }
+  });
 
   let average = null;
   if (count > 0) {
-    const sum = values.reduce((acc, curr) => acc + curr, 0);
     average = Math.round((sum / count) * 10) / 10;
   }
 
@@ -394,9 +431,9 @@ function renderStudentsView() {
 
     let statusPill = '';
     if (stats.status === 'completed') {
-      statusPill = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30">Selesai (18/18)</span>`;
+      statusPill = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30">Selesai (16/16)</span>`;
     } else if (stats.status === 'draft') {
-      statusPill = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/30">Draft (${stats.count}/18)</span>`;
+      statusPill = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/30">Draft (${stats.count}/16)</span>`;
     } else {
       statusPill = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-700/70 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-transparent">Belum Dinilai</span>`;
     }
@@ -507,6 +544,37 @@ function getCurrentStudent() {
   return state.students.find(s => s.id === state.currentStudentId);
 }
 
+// Set Indicator Sort Order ('workflow' vs 'standard')
+function setIndicatorSortOrder(order) {
+  vibrate(15);
+  state.sortOrder = order;
+  localStorage.setItem('ukk_sort_order', order);
+
+  const btnWorkflow = document.getElementById('btn-sort-workflow');
+  const btnStandard = document.getElementById('btn-sort-standard');
+  const hintEl = document.getElementById('sort-order-hint');
+
+  if (order === 'workflow') {
+    if (btnWorkflow) {
+      btnWorkflow.className = 'py-2 px-2.5 rounded-xl font-bold flex items-center justify-center gap-1.5 transition-all bg-indigo-600 text-white shadow-sm btn-press';
+    }
+    if (btnStandard) {
+      btnStandard.className = 'py-2 px-2.5 rounded-xl font-bold flex items-center justify-center gap-1.5 transition-all bg-slate-100 dark:bg-slate-700/70 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white btn-press';
+    }
+    if (hintEl) hintEl.textContent = 'Bisa dinilai diawal ➔ selesai';
+  } else {
+    if (btnWorkflow) {
+      btnWorkflow.className = 'py-2 px-2.5 rounded-xl font-bold flex items-center justify-center gap-1.5 transition-all bg-slate-100 dark:bg-slate-700/70 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white btn-press';
+    }
+    if (btnStandard) {
+      btnStandard.className = 'py-2 px-2.5 rounded-xl font-bold flex items-center justify-center gap-1.5 transition-all bg-indigo-600 text-white shadow-sm btn-press';
+    }
+    if (hintEl) hintEl.textContent = 'Elemen Utama & Pendukung';
+  }
+
+  renderAssessmentView();
+}
+
 function renderAssessmentView() {
   const stu = getCurrentStudent();
   if (!stu) return;
@@ -524,51 +592,176 @@ function renderAssessmentView() {
     notesEl.value = stu.keterangan || '';
   }
 
-  // Render Indicators (Utama vs Pendukung)
-  const containerUtama = document.getElementById('indicators-utama');
-  const containerPendukung = document.getElementById('indicators-pendukung');
+  // Update order switcher button states
+  const btnWorkflow = document.getElementById('btn-sort-workflow');
+  const btnStandard = document.getElementById('btn-sort-standard');
+  const hintEl = document.getElementById('sort-order-hint');
 
-  let htmlUtama = '';
-  let htmlPendukung = '';
+  if (state.sortOrder === 'workflow') {
+    if (btnWorkflow) btnWorkflow.className = 'py-2 px-2.5 rounded-xl font-bold flex items-center justify-center gap-1.5 transition-all bg-indigo-600 text-white shadow-sm btn-press';
+    if (btnStandard) btnStandard.className = 'py-2 px-2.5 rounded-xl font-bold flex items-center justify-center gap-1.5 transition-all bg-slate-100 dark:bg-slate-700/70 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white btn-press';
+    if (hintEl) hintEl.textContent = 'Bisa dinilai diawal ➔ selesai';
+  } else {
+    if (btnWorkflow) btnWorkflow.className = 'py-2 px-2.5 rounded-xl font-bold flex items-center justify-center gap-1.5 transition-all bg-slate-100 dark:bg-slate-700/70 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white btn-press';
+    if (btnStandard) btnStandard.className = 'py-2 px-2.5 rounded-xl font-bold flex items-center justify-center gap-1.5 transition-all bg-indigo-600 text-white shadow-sm btn-press';
+    if (hintEl) hintEl.textContent = 'Elemen Utama & Pendukung';
+  }
 
-  state.indicators.forEach((ind, index) => {
-    const scoreVal = (stu.nilai && stu.nilai[index] !== undefined && stu.nilai[index] !== null) 
-      ? stu.nilai[index] 
-      : '';
+  const container = document.getElementById('indicators-list-container');
+  if (!container) return;
 
-    const isFilled = scoreVal !== '';
-    const itemHtml = createIndicatorCardHtml(ind, index, scoreVal, isFilled);
+  let html = '';
 
-    if (ind.cat === 'utama') {
-      htmlUtama += itemHtml;
-    } else {
-      htmlPendukung += itemHtml;
-    }
-  });
+  if (state.sortOrder === 'workflow') {
+    // URUTAN ALUR WAKTU UJIAN (1 s/d 16)
+    const sorted = [...state.indicators].sort((a, b) => a.stageNum - b.stageNum);
 
-  if (containerUtama) containerUtama.innerHTML = htmlUtama;
-  if (containerPendukung) containerPendukung.innerHTML = htmlPendukung;
+    const groupEarly = sorted.filter(i => i.stage === 'early');
+    const groupMid = sorted.filter(i => i.stage === 'mid' || i.stage === 'late');
+    const groupFinal = sorted.filter(i => i.stage === 'final');
+
+    // Section 1: Bisa Dinilai di Awal
+    html += `
+      <div class="space-y-3">
+        <div class="flex items-center justify-between pb-1 border-b border-emerald-500/30">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+            <div>
+              <h3 class="text-xs uppercase tracking-wider font-extrabold text-emerald-700 dark:text-emerald-400">
+                Tahap 1: Bisa Dinilai di Awal
+              </h3>
+              <p class="text-[10px] text-slate-500 dark:text-slate-400">Workstation, K3, metode & konsep data (projek belum selesai)</p>
+            </div>
+          </div>
+          <span class="text-[10px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-500/15 border border-emerald-200 dark:border-emerald-500/30 px-2 py-0.5 rounded shrink-0">
+            ${groupEarly.length} Indikator
+          </span>
+        </div>
+        <div class="space-y-2.5">
+          ${groupEarly.map(ind => renderIndicatorCard(stu, ind)).join('')}
+        </div>
+      </div>
+    `;
+
+    // Section 2: Saat Pengerjaan & Pengkodean
+    html += `
+      <div class="space-y-3 pt-2">
+        <div class="flex items-center justify-between pb-1 border-b border-indigo-500/30">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+            <div>
+              <h3 class="text-xs uppercase tracking-wider font-extrabold text-indigo-700 dark:text-indigo-400">
+                Tahap 2: Saat Pengerjaan & Coding
+              </h3>
+              <p class="text-[10px] text-slate-500 dark:text-slate-400">Kemandirian coding, kerapian kode, CRUD & data uji</p>
+            </div>
+          </div>
+          <span class="text-[10px] font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-500/15 border border-indigo-200 dark:border-indigo-500/30 px-2 py-0.5 rounded shrink-0">
+            ${groupMid.length} Indikator
+          </span>
+        </div>
+        <div class="space-y-2.5">
+          ${groupMid.map(ind => renderIndicatorCard(stu, ind)).join('')}
+        </div>
+      </div>
+    `;
+
+    // Section 3: Wajib Selesai (Demo Uji Coba)
+    html += `
+      <div class="space-y-3 pt-2">
+        <div class="flex items-center justify-between pb-1 border-b border-rose-500/30">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+            <div>
+              <h3 class="text-xs uppercase tracking-wider font-extrabold text-rose-700 dark:text-rose-400">
+                Tahap 3: Projek Selesai (Uji Coba & Demo)
+              </h3>
+              <p class="text-[10px] text-slate-500 dark:text-slate-400">Demo live pengujian fitur, output sistem & laporan akhir</p>
+            </div>
+          </div>
+          <span class="text-[10px] font-bold text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-500/15 border border-rose-200 dark:border-rose-500/30 px-2 py-0.5 rounded shrink-0">
+            ${groupFinal.length} Indikator
+          </span>
+        </div>
+        <div class="space-y-2.5">
+          ${groupFinal.map(ind => renderIndicatorCard(stu, ind)).join('')}
+        </div>
+      </div>
+    `;
+
+  } else {
+    // URUTAN STANDAR DOKUMEN (Utama & Pendukung)
+    const sortedUtama = state.indicators.filter(i => i.cat === 'utama').sort((a, b) => a.origNum - b.origNum);
+    const sortedPendukung = state.indicators.filter(i => i.cat === 'pendukung').sort((a, b) => a.origNum - b.origNum);
+
+    html += `
+      <div class="space-y-3">
+        <div class="flex items-center justify-between pb-1 border-b border-indigo-500/30">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-indigo-600 dark:bg-indigo-500"></span>
+            <h3 class="text-xs uppercase tracking-wider font-extrabold text-indigo-700 dark:text-indigo-400">
+              Kriteria Elemen Kompetensi Utama
+            </h3>
+          </div>
+          <span class="text-[10px] font-bold text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">
+            ${sortedUtama.length} Indikator
+          </span>
+        </div>
+        <div class="space-y-2.5">
+          ${sortedUtama.map(ind => renderIndicatorCard(stu, ind)).join('')}
+        </div>
+      </div>
+
+      <div class="space-y-3 pt-2">
+        <div class="flex items-center justify-between pb-1 border-b border-teal-500/30">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-teal-500 dark:bg-teal-400"></span>
+            <h3 class="text-xs uppercase tracking-wider font-extrabold text-teal-700 dark:text-teal-400">
+              Kriteria Elemen Kompetensi Pendukung
+            </h3>
+          </div>
+          <span class="text-[10px] font-bold text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">
+            ${sortedPendukung.length} Indikator
+          </span>
+        </div>
+        <div class="space-y-2.5">
+          ${sortedPendukung.map(ind => renderIndicatorCard(stu, ind)).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  container.innerHTML = html;
 
   updateAssessmentStats();
   updateStudentSwitcherButtons();
 }
 
-function createIndicatorCardHtml(ind, index, scoreVal, isFilled) {
+function renderIndicatorCard(stu, ind) {
+  const scoreVal = getStudentIndicatorScore(stu, ind);
+  const isFilled = scoreVal !== '';
+
+  const displayNum = state.sortOrder === 'workflow' ? ind.stageNum : ind.origNum;
+  const numLabel = state.sortOrder === 'workflow' ? `Tahap #${ind.stageNum}` : `Indikator #${ind.origNum}`;
+
   return `
-    <div id="card-ind-${index}" class="p-3.5 rounded-2xl bg-white dark:bg-slate-800/80 border ${
+    <div id="card-ind-${ind.id}" class="p-3.5 rounded-2xl bg-white dark:bg-slate-800/80 border ${
       isFilled ? 'border-indigo-500/50 dark:border-indigo-500/50' : 'border-slate-200 dark:border-slate-700/60'
     } transition-all space-y-2.5 shadow-sm">
       
       <!-- Title & Num -->
       <div class="flex items-start justify-between gap-2">
-        <div class="space-y-0.5 flex-1 min-w-0">
-          <div class="flex items-center gap-1.5">
-            <span class="w-5 h-5 rounded-md bg-slate-100 dark:bg-slate-700/90 text-slate-700 dark:text-slate-300 text-[11px] font-bold flex items-center justify-center">
-              ${ind.num}
+        <div class="space-y-1 flex-1 min-w-0">
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <span class="w-5 h-5 rounded-md bg-slate-100 dark:bg-slate-700/90 text-slate-700 dark:text-slate-300 text-[11px] font-bold flex items-center justify-center shrink-0">
+              ${displayNum}
             </span>
-            <span class="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Indikator #${ind.num}</span>
+            <span class="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">${numLabel}</span>
+            <span class="text-[10px] font-semibold px-2 py-0.5 rounded-md border ${ind.stageColor}">
+              ${ind.stageBadge}
+            </span>
           </div>
-          <h4 class="text-xs font-bold text-slate-900 dark:text-white leading-snug pt-1">
+          <h4 class="text-xs font-bold text-slate-900 dark:text-white leading-snug pt-0.5">
             ${ind.title}
           </h4>
           <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-tight">
@@ -577,17 +770,17 @@ function createIndicatorCardHtml(ind, index, scoreVal, isFilled) {
         </div>
 
         <!-- Clean Numeric Input without browser spinner arrows -->
-        <div class="shrink-0 flex flex-col items-end">
+        <div class="shrink-0 flex flex-col items-end pl-1">
           <input type="number" 
                  inputmode="numeric"
                  pattern="[0-9]*"
-                 id="input-ind-${index}" 
+                 id="input-ind-${ind.id}" 
                  min="0" 
                  max="100" 
                  step="1"
                  value="${scoreVal}"
                  placeholder="0 - 100"
-                 oninput="handleScoreInput(${index}, this.value)"
+                 oninput="handleScoreInputById('${ind.id}', this.value)"
                  class="w-20 py-1.5 px-2 text-center text-sm font-extrabold bg-slate-50 dark:bg-slate-900 border ${
                    isFilled ? 'border-indigo-500 text-indigo-700 dark:text-indigo-300 ring-1 ring-indigo-500/30' : 'border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-300'
                  } rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-inner">
@@ -600,18 +793,18 @@ function createIndicatorCardHtml(ind, index, scoreVal, isFilled) {
         <!-- Preset values -->
         <div class="flex items-center gap-1 overflow-x-auto py-0.5">
           <span class="text-[10px] text-slate-400 mr-0.5">Preset:</span>
-          <button type="button" onclick="setQuickScore(${index}, 75)" class="px-2 py-0.5 text-[11px] font-semibold bg-slate-100 dark:bg-slate-700/70 hover:bg-indigo-600 text-slate-700 dark:text-slate-300 hover:text-white rounded-md border border-slate-200 dark:border-slate-600/50 btn-press">75</button>
-          <button type="button" onclick="setQuickScore(${index}, 80)" class="px-2 py-0.5 text-[11px] font-semibold bg-slate-100 dark:bg-slate-700/70 hover:bg-indigo-600 text-slate-700 dark:text-slate-300 hover:text-white rounded-md border border-slate-200 dark:border-slate-600/50 btn-press">80</button>
-          <button type="button" onclick="setQuickScore(${index}, 85)" class="px-2 py-0.5 text-[11px] font-semibold bg-slate-100 dark:bg-slate-700/70 hover:bg-indigo-600 text-slate-700 dark:text-slate-300 hover:text-white rounded-md border border-slate-200 dark:border-slate-600/50 btn-press">85</button>
-          <button type="button" onclick="setQuickScore(${index}, 90)" class="px-2 py-0.5 text-[11px] font-semibold bg-slate-100 dark:bg-slate-700/70 hover:bg-indigo-600 text-slate-700 dark:text-slate-300 hover:text-white rounded-md border border-slate-200 dark:border-slate-600/50 btn-press">90</button>
-          <button type="button" onclick="setQuickScore(${index}, 95)" class="px-2 py-0.5 text-[11px] font-semibold bg-slate-100 dark:bg-slate-700/70 hover:bg-indigo-600 text-slate-700 dark:text-slate-300 hover:text-white rounded-md border border-slate-200 dark:border-slate-600/50 btn-press">95</button>
+          <button type="button" onclick="setQuickScoreById('${ind.id}', 75)" class="px-2 py-0.5 text-[11px] font-semibold bg-slate-100 dark:bg-slate-700/70 hover:bg-indigo-600 text-slate-700 dark:text-slate-300 hover:text-white rounded-md border border-slate-200 dark:border-slate-600/50 btn-press">75</button>
+          <button type="button" onclick="setQuickScoreById('${ind.id}', 80)" class="px-2 py-0.5 text-[11px] font-semibold bg-slate-100 dark:bg-slate-700/70 hover:bg-indigo-600 text-slate-700 dark:text-slate-300 hover:text-white rounded-md border border-slate-200 dark:border-slate-600/50 btn-press">80</button>
+          <button type="button" onclick="setQuickScoreById('${ind.id}', 85)" class="px-2 py-0.5 text-[11px] font-semibold bg-slate-100 dark:bg-slate-700/70 hover:bg-indigo-600 text-slate-700 dark:text-slate-300 hover:text-white rounded-md border border-slate-200 dark:border-slate-600/50 btn-press">85</button>
+          <button type="button" onclick="setQuickScoreById('${ind.id}', 90)" class="px-2 py-0.5 text-[11px] font-semibold bg-slate-100 dark:bg-slate-700/70 hover:bg-indigo-600 text-slate-700 dark:text-slate-300 hover:text-white rounded-md border border-slate-200 dark:border-slate-600/50 btn-press">90</button>
+          <button type="button" onclick="setQuickScoreById('${ind.id}', 95)" class="px-2 py-0.5 text-[11px] font-semibold bg-slate-100 dark:bg-slate-700/70 hover:bg-indigo-600 text-slate-700 dark:text-slate-300 hover:text-white rounded-md border border-slate-200 dark:border-slate-600/50 btn-press">95</button>
         </div>
 
         <!-- Stepper buttons & Clear -->
         <div class="flex items-center gap-1 shrink-0 ml-1">
-          <button type="button" onclick="stepScore(${index}, -5)" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-700/60 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold flex items-center justify-center btn-press" title="-5">-5</button>
-          <button type="button" onclick="stepScore(${index}, 5)" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-700/60 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold flex items-center justify-center btn-press" title="+5">+5</button>
-          <button type="button" onclick="clearScore(${index})" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-rose-100 dark:hover:bg-rose-900/40 text-slate-500 hover:text-rose-600 dark:hover:text-rose-300 font-bold flex items-center justify-center btn-press" title="Kosongkan">
+          <button type="button" onclick="stepScoreById('${ind.id}', -5)" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-700/60 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold flex items-center justify-center btn-press" title="-5">-5</button>
+          <button type="button" onclick="stepScoreById('${ind.id}', 5)" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-700/60 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold flex items-center justify-center btn-press" title="+5">+5</button>
+          <button type="button" onclick="clearScoreById('${ind.id}')" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-rose-100 dark:hover:bg-rose-900/40 text-slate-500 hover:text-rose-600 dark:hover:text-rose-300 font-bold flex items-center justify-center btn-press" title="Kosongkan">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
@@ -624,24 +817,21 @@ function createIndicatorCardHtml(ind, index, scoreVal, isFilled) {
   `;
 }
 
-// Handling score input change
-function handleScoreInput(index, val) {
+// Handling score input change by ID
+function handleScoreInputById(indId, val) {
   const stu = getCurrentStudent();
   if (!stu) return;
 
-  if (!stu.nilai) stu.nilai = {};
+  const ind = state.indicators.find(i => i.id === indId);
+  if (!ind) return;
 
-  if (val === '' || val === null || isNaN(val)) {
-    delete stu.nilai[index];
-  } else {
-    let num = Math.min(100, Math.max(0, parseFloat(val)));
-    stu.nilai[index] = num;
-  }
+  setStudentIndicatorScore(stu, ind, val);
 
   // Update card border & color
-  const inputEl = document.getElementById(`input-ind-${index}`);
-  const cardEl = document.getElementById(`card-ind-${index}`);
-  const isFilled = stu.nilai[index] !== undefined;
+  const inputEl = document.getElementById(`input-ind-${indId}`);
+  const cardEl = document.getElementById(`card-ind-${indId}`);
+  const scoreVal = getStudentIndicatorScore(stu, ind);
+  const isFilled = scoreVal !== '';
 
   if (cardEl && inputEl) {
     if (isFilled) {
@@ -660,29 +850,31 @@ function handleScoreInput(index, val) {
   saveToLocalStorage();
 }
 
-function setQuickScore(index, val) {
+function setQuickScoreById(indId, val) {
   vibrate(10);
-  const inputEl = document.getElementById(`input-ind-${index}`);
+  const inputEl = document.getElementById(`input-ind-${indId}`);
   if (inputEl) {
     inputEl.value = val;
-    handleScoreInput(index, val);
+    handleScoreInputById(indId, val);
   }
 }
 
-function stepScore(index, delta) {
+function stepScoreById(indId, delta) {
   vibrate(10);
   const stu = getCurrentStudent();
-  const current = (stu && stu.nilai && stu.nilai[index] !== undefined) ? Number(stu.nilai[index]) : 80;
+  const ind = state.indicators.find(i => i.id === indId);
+  const currentVal = (stu && ind) ? getStudentIndicatorScore(stu, ind) : '';
+  const current = currentVal !== '' ? Number(currentVal) : 80;
   let next = Math.min(100, Math.max(0, current + delta));
-  setQuickScore(index, next);
+  setQuickScoreById(indId, next);
 }
 
-function clearScore(index) {
+function clearScoreById(indId) {
   vibrate(10);
-  const inputEl = document.getElementById(`input-ind-${index}`);
+  const inputEl = document.getElementById(`input-ind-${indId}`);
   if (inputEl) {
     inputEl.value = '';
-    handleScoreInput(index, '');
+    handleScoreInputById(indId, '');
   }
 }
 
@@ -691,12 +883,11 @@ function batchFillScores(val) {
   const stu = getCurrentStudent();
   if (!stu) return;
 
-  if (!stu.nilai) stu.nilai = {};
-  state.indicators.forEach((_, idx) => {
-    stu.nilai[idx] = val;
-    const inputEl = document.getElementById(`input-ind-${idx}`);
+  state.indicators.forEach(ind => {
+    setStudentIndicatorScore(stu, ind, val);
+    const inputEl = document.getElementById(`input-ind-${ind.id}`);
     if (inputEl) inputEl.value = val;
-    const cardEl = document.getElementById(`card-ind-${idx}`);
+    const cardEl = document.getElementById(`card-ind-${ind.id}`);
     if (cardEl) {
       cardEl.classList.remove('border-slate-200', 'dark:border-slate-700/60');
       cardEl.classList.add('border-indigo-500/50', 'dark:border-indigo-500/50');
@@ -705,7 +896,7 @@ function batchFillScores(val) {
 
   updateAssessmentStats();
   saveToLocalStorage();
-  showToast(`Semua kriteria diisi dengan nilai ${val}!`);
+  showToast(`Semua 16 kriteria diisi dengan nilai ${val}!`);
 }
 
 function updateAssessmentStats() {
@@ -722,8 +913,8 @@ function updateAssessmentStats() {
   }
 
   if (pillEl) {
-    pillEl.textContent = `${stats.count} / 18 Terisi`;
-    if (stats.count === 18) {
+    pillEl.textContent = `${stats.count} / 16 Terisi`;
+    if (stats.count === 16) {
       pillEl.className = 'text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30 inline-block';
     } else if (stats.count > 0) {
       pillEl.className = 'text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/30 inline-block';
@@ -797,7 +988,7 @@ function saveCurrentStudentAssessment(showToastMsg = true) {
   const stu = getCurrentStudent();
   const stats = calculateStudentScore(stu);
 
-  if (stats.count === 18 && typeof confetti === 'function') {
+  if (stats.count === 16 && typeof confetti === 'function') {
     confetti({
       particleCount: 40,
       spread: 60,
@@ -806,7 +997,7 @@ function saveCurrentStudentAssessment(showToastMsg = true) {
   }
 
   if (showToastMsg) {
-    showToast(`Nilai ${stu.nama} berhasil disimpan (${stats.count}/18 terisi)!`);
+    showToast(`Nilai ${stu.nama} berhasil disimpan (${stats.count}/16 terisi)!`);
   }
 }
 
@@ -896,7 +1087,7 @@ function renderRekapView() {
             <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded ${
               stats.status === 'completed' ? 'bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-transparent' : stats.status === 'draft' ? 'bg-amber-50 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-transparent' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
             }">
-              ${stats.count}/18
+              ${stats.count}/16
             </span>
           </div>
         </div>
@@ -915,7 +1106,7 @@ function selectStudentDirect(studentId, dayId) {
 }
 
 // ==========================================
-// EXCEL EXPORT (USING SHEETJS)
+// EXCEL EXPORT (USING SHEETJS) - 16 INDIKATOR
 // ==========================================
 function exportToExcel() {
   vibrate(20);
@@ -926,7 +1117,7 @@ function exportToExcel() {
 
   showToast('Membuat file Excel...');
 
-  // Build sheet headers identical to original PENILAIAN UKK.xlsx
+  // Build sheet headers with 16 unique indicators
   const wsData = [];
 
   // Row 1 - 3: Titles
@@ -935,37 +1126,20 @@ function exportToExcel() {
   wsData.push([]);
 
   // Row 4: Super headers for criteria
-  const row4 = Array(35).fill('');
-  row4[0] = '';
-  row4[14] = 'KRITERIA ELEMEN KOMPETENSI UTAMA';
-  row4[23] = 'KRITERIA ELEMEN KOMPETENSI PENDUKUNG';
-  wsData.push(row4);
+  // 8 Utama, 8 Pendukung
+  const superHeader = Array(8 + 16 + 2).fill('');
+  superHeader[8] = 'KRITERIA ELEMEN KOMPETENSI UTAMA (8)';
+  superHeader[16] = 'KRITERIA ELEMEN KOMPETENSI PENDUKUNG (8)';
+  wsData.push(superHeader);
 
   // Row 5: Column Headers
+  const sortedUtama = state.indicators.filter(i => i.cat === 'utama').sort((a, b) => a.origNum - b.origNum);
+  const sortedPendukung = state.indicators.filter(i => i.cat === 'pendukung').sort((a, b) => a.origNum - b.origNum);
+
   const headers = [
     'NO', 'NIS', 'NAMA MURID', 'KELAS', 'PAKET SOAL', 'HARI/TANGGAL', '', 'RUANGAN / WAKTU',
-    '', '', '', '', '', '',
-    // 9 Kriteria Utama
-    'Menerapkan struktur data dan akses terhadap struktur data tersebut',
-    'Menerapkan hasil pemodelan ke dalam pengembangan program',
-    'Menerapkan coding guidelines dan best practices dalam penulisan program (kode sumber)',
-    'Menerapkan struktur data dan akses terhadap struktur data tersebut',
-    'Membuat dokumentasi modul program',
-    'Membuat dokumentasi fungsi, prosedur atau method program',
-    'Mengenerate dokumentasi',
-    'Mempersiapkan data uji',
-    'Melaksanakan prosedur uji coba',
-    // 9 Kriteria Pendukung
-    'Mengidentifikasi konsep data dan struktur data',
-    'Menggunakan metode pengembangan program',
-    'Melaporkan bahaya-bahaya di tempat kerja',
-    'Mengidentifikasi mekanisme running atau eksekusi source code',
-    'Mengidentifikasi hasil eksekusi',
-    'Menuliskan kode sumber',
-    'Melakukan identifikasi kode program',
-    'Mengidentifikasi konsep data dan struktur data',
-    'Menentukan kebutuhan uji coba dalam pengembangan',
-    // Rata-rata & Ket
+    ...sortedUtama.map(i => i.title),
+    ...sortedPendukung.map(i => i.title),
     'Rata-Rata',
     'Ket'
   ];
@@ -973,7 +1147,7 @@ function exportToExcel() {
 
   // Row 6+: Students data
   state.students.forEach((stu, idx) => {
-    const row = Array(35).fill('');
+    const row = Array(headers.length).fill('');
     row[0] = stu.no;
     row[1] = stu.nis;
     row[2] = stu.nama;
@@ -982,18 +1156,21 @@ function exportToExcel() {
     row[5] = stu.hari;
     row[7] = stu.ruangan;
 
-    // Fill indicators (Col 14 to 31 -> 0 to 17 index in array)
-    const stats = calculateStudentScore(stu);
-    for (let i = 0; i < 18; i++) {
-      if (stu.nilai && stu.nilai[i] !== undefined && stu.nilai[i] !== null && stu.nilai[i] !== '') {
-        row[14 + i] = Number(stu.nilai[i]);
-      } else {
-        row[14 + i] = '';
-      }
-    }
+    // Fill 8 Utama
+    sortedUtama.forEach((ind, uIdx) => {
+      const score = getStudentIndicatorScore(stu, ind);
+      row[8 + uIdx] = score !== '' ? Number(score) : '';
+    });
 
-    row[32] = stats.average !== null ? stats.average : '';
-    row[33] = stu.keterangan || stats.predicate;
+    // Fill 8 Pendukung
+    sortedPendukung.forEach((ind, pIdx) => {
+      const score = getStudentIndicatorScore(stu, ind);
+      row[8 + sortedUtama.length + pIdx] = score !== '' ? Number(score) : '';
+    });
+
+    const stats = calculateStudentScore(stu);
+    row[8 + 16] = stats.average !== null ? stats.average : '';
+    row[8 + 16 + 1] = stu.keterangan || stats.predicate;
 
     wsData.push(row);
   });
@@ -1010,8 +1187,7 @@ function exportToExcel() {
     { wch: 25 }, // HARI
     { wch: 5 },
     { wch: 30 }, // RUANGAN
-    ...Array(6).fill({ wch: 5 }),
-    ...Array(18).fill({ wch: 10 }), // 18 Kriteria
+    ...Array(16).fill({ wch: 18 }), // 16 Kriteria
     { wch: 12 }, // Rata-Rata
     { wch: 25 }  // Ket
   ];
@@ -1019,10 +1195,10 @@ function exportToExcel() {
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'PENGUJI KOMDIGI 2');
 
-  const filename = `PENILAIAN_UKK_RPL_${new Date().toISOString().slice(0, 10)}.xlsx`;
+  const filename = `PENILAIAN_UKK_RPL_TELKOM_${new Date().toISOString().slice(0, 10)}.xlsx`;
   XLSX.writeFile(wb, filename);
 
-  showToast('File Excel berhasil diunduh!');
+  showToast('File Excel (16 Kriteria) berhasil diunduh!');
 }
 
 // ==========================================

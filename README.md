@@ -16,15 +16,16 @@ Dioptimalkan secara ergonomis untuk layar HP **POCO F7** (dan smartphone modern 
 2. **Alur Kerja Sesuai Arahan**:
    - **Pilih Hari Ujian**: Menampilkan jadwal **Selasa, Rabu, dan Kamis** (jadwal Senin otomatis dilewati).
    - **Pilih Nama Peserta**: Dilengkapi pencarian cepat (nama/NIS) serta tab filter (*Semua, Belum Dinilai, Draft, Selesai*).
-   - **Input Nilai 18 Indikator (0 - 100)**:
-     - 9 Kriteria Elemen Kompetensi Utama
-     - 9 Kriteria Elemen Kompetensi Pendukung
+   - **Input Nilai 16 Indikator (0 - 100)**:
+     - 2 Indikator duplikat bawaan template telah dibersihkan sehingga menjadi 16 kriteria unik yang akurat.
+     - **⚡ Fitur Urutan Alur Waktu Ujian**: Anda dapat mengurutkan kriteria dari yang bisa dinilai diawal (K3, metode, perancangan database, pemodelan ERD, local server) hingga kriteria yang mewajibkan projek selesai (demo live & dokumen laporan).
+     - **📑 Tombol Tukar Urutan**: Terdapat tombol untuk berpindah fleksibel antara *Alur Waktu Ujian* dan *Urutan Standar Dokumen (Elemen Utama & Pendukung)* kapan saja tanpa merusak nilai yang sudah diinput.
    - **Fleksibel**: Indikator **bebas dikosongkan** dan disimpan sebagai *Draft*. Nilai yang sudah diisi akan tetap tersimpan saat dibuka kembali sehingga Anda bisa melanjutkan kriteria yang masih kosong.
    - **Perhitungan Rata-Rata Otomatis**: Nilai rata-rata dan predikat kompetensi dihitung secara langsung (*real-time*).
 
 3. **Fitur Praktis untuk Penguji**:
    - **Quick Score Presets**: Tombol cepat `[75]`, `[80]`, `[85]`, `[90]`, `[95]` untuk setiap indikator (tanpa perlu repot mengetik keyboard di HP).
-   - **Batch Fill (Isi Cepat)**: Tombol *Set Semua: 80 / 85 / 90* untuk memberi nilai dasar ke 18 indikator sekaligus, lalu Anda cukup menyesuaikan 1-2 indikator yang menonjol.
+   - **Batch Fill (Isi Cepat)**: Tombol *Set Semua: 80 / 85 / 90* untuk memberi nilai dasar ke 16 indikator sekaligus, lalu Anda cukup menyesuaikan 1-2 indikator yang menonjol.
    - **Navigasi Cepat Antar Siswa**: Tombol *Sebelumnya* dan *Berikutnya* langsung di lembar penilaian.
 
 4. **Database & Penyimpanan Fleksibel**:

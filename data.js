@@ -1,132 +1,183 @@
 // Data Master Penilaian UKK SMK Rekayasa Perangkat Lunak
 // Penguji: Tenaga Ahli (KOMDIGI 2)
+// 16 Indikator Unik (Dua kriteria duplikat telah dibersihkan)
 
 const INITIAL_INDICATORS = [
   {
-    "id": "ind_1",
-    "cat": "utama",
-    "num": 1,
-    "title": "Menerapkan struktur data dan akses terhadap struktur data tersebut",
-    "desc": "Penggunaan tipe data, array, objek/model database dan cara pengaksesannya."
-  },
-  {
-    "id": "ind_2",
-    "cat": "utama",
-    "num": 2,
-    "title": "Menerapkan hasil pemodelan ke dalam pengembangan program",
-    "desc": "Implementasi diagram relasi ERD/UML ke tabel dan arsitektur kode."
-  },
-  {
-    "id": "ind_3",
-    "cat": "utama",
-    "num": 3,
-    "title": "Menerapkan coding guidelines dan best practices dalam penulisan program (kode sumber)",
-    "desc": "Kerapian kode, naming convention, indentation, dan struktur folder MVC/arsitektur."
-  },
-  {
-    "id": "ind_4",
-    "cat": "utama",
-    "num": 4,
-    "title": "Menerapkan struktur data dan akses terhadap struktur data tersebut",
-    "desc": "Efisiensi kueri database (CRUD), relasi tabel, dan manipulasi data."
-  },
-  {
-    "id": "ind_5",
-    "cat": "utama",
-    "num": 5,
-    "title": "Membuat dokumentasi modul program",
-    "desc": "Penjelasan alur kerja modul utama dan fungsionalitas modul sistem."
-  },
-  {
-    "id": "ind_6",
-    "cat": "utama",
-    "num": 6,
-    "title": "Membuat dokumentasi fungsi, prosedur atau method program",
-    "desc": "Komentar kode docblock/komentar fungsi penting pada controller/service."
-  },
-  {
-    "id": "ind_7",
-    "cat": "utama",
-    "num": 7,
-    "title": "Mengenerate dokumentasi",
-    "desc": "Menghasilkan dokumen laporan teknis/user guide dari program."
-  },
-  {
-    "id": "ind_8",
-    "cat": "utama",
-    "num": 8,
-    "title": "Mempersiapkan data uji",
-    "desc": "Penyediaan data dummy/seeder yang representatif untuk pengujian fitur."
-  },
-  {
-    "id": "ind_9",
-    "cat": "utama",
-    "num": 9,
-    "title": "Melaksanakan prosedur uji coba",
-    "desc": "Pengujian fitur form, validasi input, autentikasi, dan respons error."
-  },
-  {
-    "id": "ind_10",
+    "id": "ind_12",
+    "origNum": 12,
     "cat": "pendukung",
-    "num": 10,
-    "title": "Mengidentifikasi konsep data dan struktur data",
-    "desc": "Pemahaman siswa terkait pemilihan tipe kolom, primary/foreign key."
+    "title": "Melaporkan bahaya-bahaya di tempat kerja",
+    "desc": "Penerapan K3 di lab komputer: posisi duduk ergonomis, penataan kabel, keselamatan kelistrikan.",
+    "stage": "early",
+    "stageNum": 1,
+    "stageBadge": "Bisa Dinilai Diawal (K3 Lab)",
+    "stageColor": "text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-500/15 border-emerald-200 dark:border-emerald-500/30"
   },
   {
     "id": "ind_11",
+    "origNum": 11,
     "cat": "pendukung",
-    "num": 11,
     "title": "Menggunakan metode pengembangan program",
-    "desc": "Penerapan metode SDLC (Agile/Waterfall) dalam pengerjaan projek."
+    "desc": "Pemahaman dan penerapan metode SDLC (Agile/Waterfall) dalam perencanaan pengerjaan projek.",
+    "stage": "early",
+    "stageNum": 2,
+    "stageBadge": "Bisa Dinilai Diawal (Metode)",
+    "stageColor": "text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-500/15 border-emerald-200 dark:border-emerald-500/30"
   },
   {
-    "id": "ind_12",
+    "id": "ind_10",
+    "origNum": 10,
     "cat": "pendukung",
-    "num": 12,
-    "title": "Melaporkan bahaya-bahaya di tempat kerja",
-    "desc": "Penerapan K3 di lab komputer (posisi duduk, manajemen kabel, kelistrikan)."
+    "title": "Mengidentifikasi konsep data dan struktur data",
+    "desc": "Pemahaman konsep basis data, pemilihan tipe kolom, primary key, foreign key, dan normalisasi.",
+    "stage": "early",
+    "stageNum": 3,
+    "stageBadge": "Bisa Dinilai Diawal (Desain DB)",
+    "stageColor": "text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-500/15 border-emerald-200 dark:border-emerald-500/30"
+  },
+  {
+    "id": "ind_2",
+    "origNum": 2,
+    "cat": "utama",
+    "title": "Menerapkan hasil pemodelan ke dalam pengembangan program",
+    "desc": "Implementasi rancangan diagram ERD/UML ke dalam migrasi tabel basis data dan relasi model.",
+    "stage": "early",
+    "stageNum": 4,
+    "stageBadge": "Bisa Dinilai Diawal (Pemodelan)",
+    "stageColor": "text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-500/15 border-emerald-200 dark:border-emerald-500/30"
   },
   {
     "id": "ind_13",
+    "origNum": 13,
     "cat": "pendukung",
-    "num": 13,
     "title": "Mengidentifikasi mekanisme running atau eksekusi source code",
-    "desc": "Kemampuan menjalankan server lokal (artisan serve, npm dev, xampp)."
-  },
-  {
-    "id": "ind_14",
-    "cat": "pendukung",
-    "num": 14,
-    "title": "Mengidentifikasi hasil eksekusi",
-    "desc": "Membaca output terminal, pesan error/exception log, dan penanganannya."
+    "desc": "Kemampuan menjalankan local development server (artisan serve, npm run dev, XAMPP/Apache).",
+    "stage": "early",
+    "stageNum": 5,
+    "stageBadge": "Bisa Dinilai Diawal (Setup Env)",
+    "stageColor": "text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-500/15 border-emerald-200 dark:border-emerald-500/30"
   },
   {
     "id": "ind_15",
+    "origNum": 15,
     "cat": "pendukung",
-    "num": 15,
     "title": "Menuliskan kode sumber",
-    "desc": "Kecepatan dan pemahaman saat mengetik logika sintaks secara mandiri."
+    "desc": "Kemampuan dan kemandirian siswa saat mengetik logika sintaks kode secara langsung.",
+    "stage": "mid",
+    "stageNum": 6,
+    "stageBadge": "Saat Pengerjaan / Coding",
+    "stageColor": "text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-500/15 border-indigo-200 dark:border-indigo-500/30"
   },
   {
     "id": "ind_16",
+    "origNum": 16,
     "cat": "pendukung",
-    "num": 16,
     "title": "Melakukan identifikasi kode program",
-    "desc": "Mampu menjelaskan baris kode tertentu saat ditanya oleh penguji."
+    "desc": "Mampu menjelaskan alur logika dan maksud baris kode tertentu saat ditanya langsung oleh penguji.",
+    "stage": "mid",
+    "stageNum": 7,
+    "stageBadge": "Saat Pengerjaan / Coding",
+    "stageColor": "text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-500/15 border-indigo-200 dark:border-indigo-500/30"
   },
   {
-    "id": "ind_17",
-    "cat": "pendukung",
-    "num": 17,
-    "title": "Mengidentifikasi konsep data dan struktur data",
-    "desc": "Analisis kebutuhan data untuk pelaporan/dashboard sistem."
+    "id": "ind_3",
+    "origNum": 3,
+    "cat": "utama",
+    "title": "Menerapkan coding guidelines dan best practices dalam penulisan program (kode sumber)",
+    "desc": "Kerapian kode, naming convention, indentation konsisten, dan struktur folder arsitektur MVC.",
+    "stage": "mid",
+    "stageNum": 8,
+    "stageBadge": "Saat Pengerjaan / Coding",
+    "stageColor": "text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-500/15 border-indigo-200 dark:border-indigo-500/30"
+  },
+  {
+    "id": "ind_1",
+    "origNum": 1,
+    "cat": "utama",
+    "title": "Menerapkan struktur data dan akses terhadap struktur data tersebut",
+    "desc": "Implementasi kueri database (CRUD), relasi tabel data, dan manipulasi array/objek pada controller.",
+    "stage": "mid",
+    "stageNum": 9,
+    "stageBadge": "Saat Pengerjaan / Coding",
+    "stageColor": "text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-500/15 border-indigo-200 dark:border-indigo-500/30"
+  },
+  {
+    "id": "ind_6",
+    "origNum": 6,
+    "cat": "utama",
+    "title": "Membuat dokumentasi fungsi, prosedur atau method program",
+    "desc": "Pemberian komentar kode docblock pada fungsi/method penting di controller atau service.",
+    "stage": "mid",
+    "stageNum": 10,
+    "stageBadge": "Saat Pengerjaan / Coding",
+    "stageColor": "text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-500/15 border-indigo-200 dark:border-indigo-500/30"
+  },
+  {
+    "id": "ind_5",
+    "origNum": 5,
+    "cat": "utama",
+    "title": "Membuat dokumentasi modul program",
+    "desc": "Penjelasan tertulis mengenai alur kerja dan fungsionalitas modul-modul sistem.",
+    "stage": "late",
+    "stageNum": 11,
+    "stageBadge": "Menjelang Akhir",
+    "stageColor": "text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-500/15 border-amber-200 dark:border-amber-500/30"
+  },
+  {
+    "id": "ind_8",
+    "origNum": 8,
+    "cat": "utama",
+    "title": "Mempersiapkan data uji",
+    "desc": "Penyediaan data dummy / database seeder yang representatif untuk pengujian fitur aplikasi.",
+    "stage": "late",
+    "stageNum": 12,
+    "stageBadge": "Persiapan Uji Coba",
+    "stageColor": "text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-500/15 border-amber-200 dark:border-amber-500/30"
   },
   {
     "id": "ind_18",
+    "origNum": 18,
     "cat": "pendukung",
-    "num": 18,
     "title": "Menentukan kebutuhan uji coba dalam pengembangan",
-    "desc": "Penyusunan skenario uji coba skenario normal dan skenario error."
+    "desc": "Penyusunan skenario pengujian (skenario data valid, skenario form kosong, skenario error).",
+    "stage": "late",
+    "stageNum": 13,
+    "stageBadge": "Persiapan Uji Coba",
+    "stageColor": "text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-500/15 border-amber-200 dark:border-amber-500/30"
+  },
+  {
+    "id": "ind_9",
+    "origNum": 9,
+    "cat": "utama",
+    "title": "Melaksanakan prosedur uji coba",
+    "desc": "Pengujian live demo fitur aplikasi, validasi form, hak akses user, dan alur transaksi projek.",
+    "stage": "final",
+    "stageNum": 14,
+    "stageBadge": "Wajib Projek Selesai (Demo)",
+    "stageColor": "text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-500/15 border-rose-200 dark:border-rose-500/30"
+  },
+  {
+    "id": "ind_14",
+    "origNum": 14,
+    "cat": "pendukung",
+    "title": "Mengidentifikasi hasil eksekusi",
+    "desc": "Membaca dan mengevaluasi output sistem saat dijalankan, pesan sukses, atau respons error handling.",
+    "stage": "final",
+    "stageNum": 15,
+    "stageBadge": "Wajib Projek Selesai (Demo)",
+    "stageColor": "text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-500/15 border-rose-200 dark:border-rose-500/30"
+  },
+  {
+    "id": "ind_7",
+    "origNum": 7,
+    "cat": "utama",
+    "title": "Mengenerate dokumentasi",
+    "desc": "Menghasilkan dokumen laporan teknis atau petunjuk penggunaan (user guide) dari aplikasi.",
+    "stage": "final",
+    "stageNum": 16,
+    "stageBadge": "Wajib Projek Selesai (Laporan)",
+    "stageColor": "text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-500/15 border-rose-200 dark:border-rose-500/30"
   }
 ];
 
@@ -829,8 +880,7 @@ const INITIAL_STUDENTS = [
   }
 ];
 
-// Export for ES modules and browser global
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   window.INITIAL_INDICATORS = INITIAL_INDICATORS;
   window.EXAM_DAYS = EXAM_DAYS;
   window.INITIAL_STUDENTS = INITIAL_STUDENTS;
